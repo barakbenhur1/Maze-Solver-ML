@@ -189,6 +189,9 @@ class ViewController: UIViewController {
                 
                 guard win else {
                     NumOfLoases += 1
+                    for player in board.players {
+                        player.isFinish = true
+                    }
                     //                    let total = NumOfLoases + numOfWins
 //                    print("loase\n\("\(Int(100 * CGFloat(CGFloat(NumOfLoases) / CGFloat(total))))% loase rate")")
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -462,7 +465,7 @@ public class Board {
     
     private var winImage: UIImageView!
     
-    private var players: [CharacterEntity]!
+    var players: [CharacterEntity]!
     
     private var numOfPlayers: Int!
     
