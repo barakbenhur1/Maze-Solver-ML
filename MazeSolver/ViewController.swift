@@ -38,6 +38,8 @@ class ViewController: UIViewController {
         
         let label = scoreLabel(size: sizeY)
         
+        label.numberOfLines = 2
+        
         view.addSubview(label)
         
         numOfBlocks = Int.random(in: minNumSpoonedOfBlocks)
@@ -146,7 +148,7 @@ class ViewController: UIViewController {
         board.start()
         
         if board.smartPlay {
-            label.text = "Gen: \(0)"
+            label.text = "Gen: \(0)\n\(label.text!)"
             let button = UIButton(frame: CGRect(origin: label.frame.origin, size: CGSize(width: label.frame.width / 3, height: label.frame.height)))
             
             button.setTitle("Save / Load", for: .normal)
@@ -194,6 +196,9 @@ class ViewController: UIViewController {
                         if !board.smartPlay {
                             label.text = "\(leftBlocks) Out Of \(numOfBlocks + leftBlocks) Blocks Left"
                         }
+                        else {
+                            label.text! += "\n\(leftBlocks) Out Of \(numOfBlocks + leftBlocks) Blocks Left"
+                        }
                         leftBlocksCount = leftBlocks
                         startOverStart = false
                         board.restart()
@@ -214,7 +219,7 @@ class ViewController: UIViewController {
                     }
                     leftBlocksCount = leftBlocks
                     
-                    label.text = "\(leftBlocksCount) Out Of \(numOfBlocks + leftBlocks) Blocks Left"
+                    label.text = "\n\(leftBlocksCount) Out Of \(numOfBlocks + leftBlocks) Blocks Left"
                     var numOfSkips = 0
                     while blocks.count < numOfBlocks {
                         let randomX = Int.random(in: 0...numOfX - 1)
@@ -305,7 +310,12 @@ class ViewController: UIViewController {
                 }
                 board.addEffect?(blocks[key]!!)
                 leftBlocksCount -= 1
-                label.text = "\(leftBlocksCount) Out Of \(numOfBlocks + leftBlocks) Blocks Left"
+                if board.smartPlay {
+                    label.text = "Gen: \(board.poll!.getGeneration()) \n\(leftBlocksCount) Out Of \(numOfBlocks + leftBlocks) Blocks Left"
+                }
+                else {
+                    label.text = "\(leftBlocksCount) Out Of \(numOfBlocks + leftBlocks) Blocks Left"
+                }
             }
         }
         
@@ -429,9 +439,9 @@ class ViewController: UIViewController {
     }
     
     private func scoreLabel(size: CGFloat) -> UILabel {
-        let spaceY = 40
+        let spaceY = 20
         let spaceX = 30
-        let height = 30
+        let height = 50
         let width = Int(CGFloat(numOfX) * size) - (spaceX * 2)
         let label = UILabel(frame: CGRect(x: spaceX, y: spaceY, width: width, height: height))
         label.textColor = .init(hexString: "#2f2f2f")
@@ -498,7 +508,7 @@ public class Board {
     init(smartPlay: Bool = false, blocks: [CGPoint : Block?], view: UIView?, size: CGPoint, sizeOfItem: CGSize, numberOfPlayers: Int, gameParams: (startLocations: [CGPoint], winLocation: CGPoint), padding: CGFloat) {
         self.smartPlay = smartPlay
         if smartPlay {
-            let lifeSpan: CGFloat = 8
+            let lifeSpan: CGFloat = 12
             poll = MlPoll<MovePath>(num: numberOfPlayers, lifeSpan: lifeSpan, moveSpeed: CGFloat(playerMoveTime), mutatingRate: 0.04)
             let movePath = MovePath()
             let endPoint = gameParams.winLocation
@@ -703,7 +713,7 @@ public class Board {
     }
     
     private var startDelay: Double = 0.01
-    private var playerMoveTime: Double = 0.08
+    private var playerMoveTime: Double = 0.14
     private var enemyMoveTime: Double = 0.48
     private var playerMoveAnimationTime: Double = 0.4
     private var isCalc: Bool = false
