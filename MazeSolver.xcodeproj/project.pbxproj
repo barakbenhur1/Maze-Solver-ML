@@ -23,8 +23,8 @@
 		B64BCECC2684A497005EE20E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64BCEBF2684A496005EE20E /* LaunchScreen.storyboard */; };
 		B64BCECD2684A497005EE20E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B64BCEC02684A497005EE20E /* Assets.xcassets */; };
 		B64BCECE2684A497005EE20E /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64BCEC12684A497005EE20E /* Vertex.swift */; };
-		B64BCF3926858D48005EE20E /* BbhGMl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B64BCF3826858D48005EE20E /* BbhGMl.xcframework */; };
-		B64BCF3A26858D48005EE20E /* BbhGMl.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B64BCF3826858D48005EE20E /* BbhGMl.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B6F05AA62689357D003CCDC6 /* BbhGMl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F05AA52689357D003CCDC6 /* BbhGMl.xcframework */; };
+		B6F05AA72689357D003CCDC6 /* BbhGMl.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B6F05AA52689357D003CCDC6 /* BbhGMl.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,7 +51,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B64BCF3A26858D48005EE20E /* BbhGMl.xcframework in Embed Frameworks */,
+				B6F05AA72689357D003CCDC6 /* BbhGMl.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,7 +82,7 @@
 		B64BCEBF2684A496005EE20E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B64BCEC02684A497005EE20E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B64BCEC12684A497005EE20E /* Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
-		B64BCF3826858D48005EE20E /* BbhGMl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = BbhGMl.xcframework; path = ../../BbhGMl/build/BbhGMl.xcframework; sourceTree = "<group>"; };
+		B6F05AA52689357D003CCDC6 /* BbhGMl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = BbhGMl.xcframework; path = ../BbhGeneticMlAlgorithm/build/BbhGMl.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B64BCF3926858D48005EE20E /* BbhGMl.xcframework in Frameworks */,
+				B6F05AA62689357D003CCDC6 /* BbhGMl.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,7 +176,7 @@
 		B64BCEAB2684A42F005EE20E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B64BCF3826858D48005EE20E /* BbhGMl.xcframework */,
+				B6F05AA52689357D003CCDC6 /* BbhGMl.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

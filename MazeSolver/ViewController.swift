@@ -521,6 +521,13 @@ public class Board {
             poll?.stopHandele = {
                 self.stop()
             }
+            
+            poll?.decisionHandler = { index, length, fitnessVals, extraDimension in
+                let vals = [fitnessVals.queryVal, fitnessVals.otherVal]
+                let maxInd = vals[0] > vals[1] ? 0 : 1
+                let r = CGFloat.random(in: 0...vals[maxInd] / vals[1 - maxInd])
+                return r < 0.4 ? fitnessVals.queryVal > fitnessVals.otherVal : true  // index > length / 2 /// original - but keep ml decisionHandler implementation most of time
+            }
         }
         players = [CharacterEntity]()
         self.blocks = blocks
@@ -1346,6 +1353,7 @@ class SmartCharacterEntity: CharacterEntity {
         guard isAllowed else { return }
         location = point
         agent.getData()?.assignCurrent = location
+        agent.checkIfShouldKeep()
         
         moveInformer?(location, false)
         

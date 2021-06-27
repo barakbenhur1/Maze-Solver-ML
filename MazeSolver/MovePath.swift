@@ -104,7 +104,7 @@ public enum Direction: Encodable & Decodable {
 fileprivate let semaphore = DispatchSemaphore(value: 1)
 
 final class MovePath: DNA & Hashable & Decodable {
-    
+
     var extra: Any?
     
     private var maxNumberOfSteps: Int!
@@ -225,6 +225,10 @@ final class MovePath: DNA & Hashable & Decodable {
         let dist = distance(from: current, to: val!.current)
         let ind = (CGFloat(index) + 1)
         return (min(1 , ((1 / pow(dist + ind , 2)) + best)), CGFloat(index))
+    }
+    
+    func distanceTo(target: MovePath) -> CGFloat {
+        return distance(from: current, to: target.current)
     }
     
     private func distance(from: CGPoint, to: CGPoint) -> CGFloat {
