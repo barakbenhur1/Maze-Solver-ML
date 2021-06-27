@@ -10,14 +10,16 @@ public struct Edge<T: Hashable> {
 }
 
 extension Edge: Hashable {
-  
-  public var hashValue: Int {
-      return "\(source)\(destination)\(weight)".hashValue
-  }
-  
-  static public func ==(lhs: Edge<T>, rhs: Edge<T>) -> Bool {
-    return lhs.source == rhs.source &&
-      lhs.destination == rhs.destination &&
-      lhs.weight == rhs.weight
-  }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(source)
+        hasher.combine(destination)
+        hasher.combine(weight)
+    }
+    
+    static public func ==(lhs: Edge<T>, rhs: Edge<T>) -> Bool {
+        return lhs.source == rhs.source &&
+            lhs.destination == rhs.destination &&
+            lhs.weight == rhs.weight
+    }
 }

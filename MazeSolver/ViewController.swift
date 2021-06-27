@@ -127,7 +127,7 @@ class ViewController: UIViewController {
             blocksTemp![key] = Block(name: "block", state: .solid)
             let list = Board(blocks: blocksTemp!, view: view, size: point, sizeOfItem: size2D, numberOfPlayers: numberOfPlayers, gameParams: (startPoints, winPoint), padding: CGFloat(numOfX) *  widthRemoval / 2).getGraph(from: startPoints.first!)
             
-            let stack = CharacterEntity(type: .player, start: startPoints.first!, win: winPoint, padding: padding, playerSpeed: 0.38).depthFirstSearch(from: Vertex(data: startPoints.first!), to: Vertex(data: winPoint), graph: list)
+            let stack = CharacterEntity(identifierNum: 0, type: .player, start: startPoints.first!, win: winPoint, padding: padding, playerSpeed: 0.38).depthFirstSearch(from: Vertex(data: startPoints.first!), to: Vertex(data: winPoint), graph: list)
             
             if stack.isEmpty() {
                 numOfSkips += 1
@@ -167,16 +167,13 @@ class ViewController: UIViewController {
         var startOverStart = false
         board.startOver = { [unowned self] text in
             DispatchQueue.main.async {
-                let win = text.lowercased().contains("win")
+                var win = text.lowercased().contains("win")
                 
-                print("Gen: \(NumOfLoases + numOfWins)")
+//                print("Gen: \(NumOfLoases + numOfWins)")
                 
                 if board.smartPlay {
                     label.text = "Gen: \(board.poll!.getGeneration())"
-                    
-                    if win {
-                        return
-                    }
+                    win = false
                 }
                 
                 guard win || board.isGameOver(), !startOverStart else { return }
@@ -187,8 +184,8 @@ class ViewController: UIViewController {
                 board.container.alpha = 0.2
                 guard win else {
                     NumOfLoases += 1
-                    let total = NumOfLoases + numOfWins
-                    print("loase\n\("\(Int(100 * CGFloat(CGFloat(NumOfLoases) / CGFloat(total))))% loase rate")")
+//                    let total = NumOfLoases + numOfWins
+//                    print("loase\n\("\(Int(100 * CGFloat(CGFloat(NumOfLoases) / CGFloat(total))))% loase rate")")
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         board.container.alpha = 1
                         if !board.smartPlay {
@@ -235,7 +232,7 @@ class ViewController: UIViewController {
                         blocksTemp[key] = Block(name: "block", state: .solid)
                         let list = Board(blocks: blocksTemp, view: view, size: point, sizeOfItem: size2D, numberOfPlayers: numberOfPlayers, gameParams: (startPoints, winPoint), padding: CGFloat(numOfX) *  widthRemoval / 2).getGraph(from: startPoints.first!)
                         
-                        let stack = CharacterEntity(type: .player, start: startPoints.first!, win: winPoint, padding: padding, playerSpeed: 0.38).depthFirstSearch(from: Vertex(data: startPoints.first!), to: Vertex(data: winPoint), graph: list)
+                        let stack = CharacterEntity(identifierNum: 0, type: .player, start: startPoints.first!, win: winPoint, padding: padding, playerSpeed: 0.38).depthFirstSearch(from: Vertex(data: startPoints.first!), to: Vertex(data: winPoint), graph: list)
                         
                         if stack.isEmpty() {
                             numOfSkips += 1
@@ -250,8 +247,8 @@ class ViewController: UIViewController {
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         numOfWins += 1
-                        let total = numOfWins + NumOfLoases
-                        print("win\n\("\(Int(100 * CGFloat(CGFloat(numOfWins) / CGFloat(total))))% win rate")")
+//                        let total = numOfWins + NumOfLoases
+//                        print("win\n\("\(Int(100 * CGFloat(CGFloat(numOfWins) / CGFloat(total))))% win rate")")
                         board.container.alpha = 1
                         board.reset()
                         board.setBlocks(blocks: blocks)
@@ -322,37 +319,42 @@ class ViewController: UIViewController {
     
     @objc private func showSaveLoad() {
         //1. Create the alert controller.
-        let alert = UIAlertController(title: "Save / Load", message: "", preferredStyle: .alert)
-        
-        //2. Add the text field. You can configure it however you need.
-        alert.addTextField { (textField) in
-            textField.placeholder = "put key..."
-        }
-        
-        // 3. Grab the value from the text field, and print it when the user clicks OK.
-        alert.addAction(UIAlertAction(title: "SAVE", style: .default, handler: { [weak alert] (_) in
-            // Force unwrapping because we know it exists.
-            let textField = alert!.textFields![0]
-            let save = self.board.poll?.saveGeneration(key: textField.text!)
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "Save / Load", message: "", preferredStyle: .alert)
             
-            print("Saved: \(save!)")
-        }))
-        
-        alert.addAction(UIAlertAction(title: "LOAD", style: .default, handler: { [self, weak alert] (_) in
-            // Force unwrapping because we know it exists.
-            let textField = alert!.textFields![0]
-            let load = self.board.poll?.loadGeneration(key: textField.text!)
-            
-            if load! {
-                board.poll?.stop()
-                board.poll?.generationChange?(true)
+            //2. Add the text field. You can configure it however you need.
+            alert.addTextField { (textField) in
+                textField.placeholder = "Put Key..."
             }
             
-            print("Loaded: \(load!)")
-        }))
-        
-        // 4. Present the alert.
-        self.present(alert, animated: true, completion: nil)
+            // 3. Grab the value from the text field, and print it when the user clicks OK.
+            alert.addAction(UIAlertAction(title: "SAVE", style: .default, handler: { [weak alert] (_) in
+                // Force unwrapping because we know it exists.
+                let textField = alert!.textFields![0]
+                let save = self.board.poll?.saveGeneration(key: textField.text!)
+                
+                print("Saved: \(save!)")
+            }))
+            
+            alert.addAction(UIAlertAction(title: "LOAD", style: .default, handler: { [self, weak alert] (_) in
+                // Force unwrapping because we know it exists.
+                let textField = alert!.textFields![0]
+                let load = self.board.poll?.loadGeneration(key: textField.text!)
+                
+                if load! {
+                    board.poll?.stop()
+                    board.poll?.generationChange?(true, {
+                        board.poll?.cleanIfNeeded()
+                        board.poll?.continue()
+                    })
+                }
+                
+                print("Loaded: \(load!)")
+            }))
+            
+            // 4. Present the alert.
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     enum EffectType {
@@ -364,8 +366,8 @@ class ViewController: UIViewController {
                 return "block"
             case .cant:
                 return "enemy@"
-            default:
-                return "block"
+//            default:
+//                return "block"
             }
         }
         
@@ -375,8 +377,8 @@ class ViewController: UIViewController {
                 return 0
             case .cant:
                 return 8
-            default:
-                return 0
+//            default:
+//                return 0
             }
         }
     }
@@ -487,13 +489,22 @@ public class Board {
     var moveBlockDown: UISwipeGestureRecognizer!
     var moveBlockUp: UISwipeGestureRecognizer!
     
+    
+    private var doneDrawing: (() -> ()) = {}
+    
     init(smartPlay: Bool = false, blocks: [CGPoint : Block?], view: UIView?, size: CGPoint, sizeOfItem: CGSize, numberOfPlayers: Int, gameParams: (startLocations: [CGPoint], winLocation: CGPoint), padding: CGFloat) {
         self.smartPlay = smartPlay
         if smartPlay {
-            poll = MlPoll<MovePath>(num: numberOfPlayers, lifeSpan: 12, mutatingRate: 0.005)
+            let lifeSpan: CGFloat = 8
+            poll = MlPoll<MovePath>(num: numberOfPlayers, lifeSpan: lifeSpan, moveSpeed: CGFloat(playerMoveTime), mutatingRate: 0.04)
             let movePath = MovePath()
-            movePath.current = gameParams.winLocation
-            poll?.start(target: movePath, length: 120, extra: gameParams.startLocations.first as Any)
+            let endPoint = gameParams.winLocation
+            movePath.assignCurrent = endPoint
+            poll?.start(target: movePath, extra: gameParams.startLocations.first as Any)
+        
+            poll?.stopHandele = {
+                self.stop()
+            }
         }
         players = [CharacterEntity]()
         self.blocks = blocks
@@ -523,8 +534,9 @@ public class Board {
             }
         }
         
-        poll?.generationChange = { [self] show in
-            poll!.stop()
+        poll?.generationChange = { [self] show, done in
+//            poll!.stop()
+            doneDrawing = done
             startOver?("")
         }
     }
@@ -727,11 +739,12 @@ public class Board {
         while players.count < numOfPlayers {
             var player: CharacterEntity!
             
+            let id = players.count
             if smartPlay {
-                player = SmartCharacterEntity(agent: poll!.getAgents()[players.count], type: .player, start: startLocations[players.count], win: win, padding: padding, playerSpeed: playerMoveTime)
+                player = SmartCharacterEntity(identifier: id, agentGetter: poll!.getAgentsGetters()[id], type: .player, start: startLocations[id], win: win, padding: padding, playerSpeed: playerMoveTime)
             }
             else {
-                player = CharacterEntity(type: players.count == 0 ? .player : .enemy, start: startLocations[players.count], win: win, padding: padding, playerSpeed: players.count == 0 ? playerMoveTime : enemyMoveTime)
+                player = CharacterEntity(identifierNum: id, type: players.count == 0 ? .player : .enemy, start: startLocations[id], win: win, padding: padding, playerSpeed: players.count == 0 ? playerMoveTime : enemyMoveTime)
             }
             
             container.addSubview(player.image)
@@ -816,12 +829,12 @@ public class Board {
                 didWin = false
                 guard player.playerType == .player || self.isGameOver() else { return }
                 didWin = player.playerType == .player && !player.lose
-                if didWin {
-                    let index = players.firstIndex(where: { (playerCheck) -> Bool in
-                        return player == playerCheck
-                    })
-                    poll?.getAgents()[index!].fitnessVal! *= 10
-                }
+//                if didWin {
+//                    let index = players.firstIndex(where: { (playerCheck) -> Bool in
+//                        return player == playerCheck
+//                    })
+//                    poll?.getAgents()[index!].fitnessVal! *= 10
+//                }
                 
                 for player in self.players {
                     guard player.think != nil else { continue }
@@ -858,7 +871,8 @@ public class Board {
             i += 1
         }
         
-        poll!.contine()
+        doneDrawing()
+        
         for player in players {
             DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
                 player.start()
@@ -961,6 +975,8 @@ public class Board {
 
 class CharacterEntity: CustomStringConvertible {
     
+    fileprivate let identifier: Int!
+    
     var description: String {
         return "\nlocation: \(location!)\nisFinish: \(isFinish)\nlose: \(lose)\nstack: \(stack.description)\nfinish: \(isFinish)\nstuck: \(isStuck)"
     }
@@ -1007,9 +1023,10 @@ class CharacterEntity: CustomStringConvertible {
     
     private var xPadding: CGFloat = 0
     
-    init(type: PlayerType,start: CGPoint ,win: CGPoint, padding: CGFloat, playerSpeed: Double) {
+    init(identifierNum: Int, type: PlayerType,start: CGPoint ,win: CGPoint, padding: CGFloat, playerSpeed: Double) {
         playerType = type
         location = start
+        identifier = identifierNum
         image = UIImageView(image: type.getImage())
         winLocation = win
         xPadding = padding
@@ -1228,7 +1245,7 @@ class CharacterEntity: CustomStringConvertible {
         outer: while let vertex = stack.peek(), vertex != end { // 1
             
             guard let neighbors = graph.edges(from: vertex), neighbors.count > 0 else { // 2
-                stack.pop()
+                _ = stack.pop()
                 continue
             }
             
@@ -1243,7 +1260,7 @@ class CharacterEntity: CustomStringConvertible {
                 }
             }
             
-            stack.pop()
+           _ = stack.pop()
         }
         
         return stack // 4
@@ -1251,11 +1268,16 @@ class CharacterEntity: CustomStringConvertible {
 }
 
 class SmartCharacterEntity: CharacterEntity {
-    private let agent: Agent<MovePath>!
+//    private let agent: Agent<MovePath>!
     
-    init(agent: Agent<MovePath>, type: PlayerType, start: CGPoint ,win: CGPoint, padding: CGFloat, playerSpeed: Double) {
-        self.agent = agent
-        super.init(type: type, start: start, win: win, padding: padding, playerSpeed: playerSpeed)
+    private var agentGetter: (_ index: Int) -> (Agent<MovePath>?) = { _ in
+        return nil
+    }
+    
+    init(identifier: Int, agentGetter: @escaping (_ index: Int) -> (Agent<MovePath>?), type: PlayerType, start: CGPoint ,win: CGPoint, padding: CGFloat, playerSpeed: Double) {
+        self.agentGetter = agentGetter
+        super.init(identifierNum: identifier, type: type, start: start, win: win, padding: padding, playerSpeed: playerSpeed)
+        self.image.alpha = 0.88
     }
     override func start() {
         timer = Timer(timeInterval: playerMoveSpeed, repeats: true, block: { (timer) in
@@ -1266,7 +1288,8 @@ class SmartCharacterEntity: CharacterEntity {
     }
     
     override func checkWhereToGo() {
-        guard (agent.getData()?.allDirections.count ?? 0) > 0 else { return }
+        guard let agent: Agent<MovePath> = agentGetter(identifier), (agent.getData()?.allDirections.count ?? 0) > 0 else { return }
+        
         let dir = agent.getData()?.getNextStep()
         
         var point: CGPoint!
@@ -1297,7 +1320,7 @@ class SmartCharacterEntity: CharacterEntity {
         var isAllowed = false
         
         for allowedBlock in allowedBlocks {
-            if point == allowedBlock.key {
+            if point == allowedBlock.key && allowedBlock.value.block?.state == .empty {
                 isAllowed = true
                 break
             }
@@ -1305,12 +1328,13 @@ class SmartCharacterEntity: CharacterEntity {
         
         guard isAllowed else { return }
         location = point
-        agent.getData()?.current = location
+        agent.getData()?.assignCurrent = location
         
         moveInformer?(location, false)
         
         if location.equalTo(winLocation) {
-            startOver?("You Win")
+//            startOver?("You Win")
+            print("Agent: \(agent.toString()) Win")
         }
     }
 }
@@ -1346,10 +1370,11 @@ extension UIColor {
         let hexString: String = hexString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         let scanner = Scanner(string: hexString)
         if (hexString.hasPrefix("#")) {
-            scanner.scanLocation = 1
+//            scanner.currentIndex = 1
+            scanner.currentIndex = scanner.string.index(after: scanner.string.startIndex)
         }
-        var color: UInt32 = 0
-        scanner.scanHexInt32(&color)
+        var color: UInt64 = 0
+        scanner.scanHexInt64(&color)
         let mask = 0x000000FF
         let r = Int(color >> 16) & mask
         let g = Int(color >> 8) & mask

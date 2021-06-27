@@ -23,9 +23,8 @@
 		B64BCECC2684A497005EE20E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64BCEBF2684A496005EE20E /* LaunchScreen.storyboard */; };
 		B64BCECD2684A497005EE20E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B64BCEC02684A497005EE20E /* Assets.xcassets */; };
 		B64BCECE2684A497005EE20E /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64BCEC12684A497005EE20E /* Vertex.swift */; };
-		B64BCF27268583B4005EE20E /* MlPoll_0.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64BCF26268583B4005EE20E /* MlPoll_0.swift */; };
-		B64BCF2B26858529005EE20E /* BbhGMl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B64BCF2A26858529005EE20E /* BbhGMl.xcframework */; };
-		B64BCF2C26858529005EE20E /* BbhGMl.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B64BCF2A26858529005EE20E /* BbhGMl.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B64BCF3926858D48005EE20E /* BbhGMl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B64BCF3826858D48005EE20E /* BbhGMl.xcframework */; };
+		B64BCF3A26858D48005EE20E /* BbhGMl.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B64BCF3826858D48005EE20E /* BbhGMl.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,13 +45,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		B64BCEAF2684A430005EE20E /* Embed Frameworks */ = {
+		B64BCF3B26858D48005EE20E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B64BCF2C26858529005EE20E /* BbhGMl.xcframework in Embed Frameworks */,
+				B64BCF3A26858D48005EE20E /* BbhGMl.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -83,8 +82,7 @@
 		B64BCEBF2684A496005EE20E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B64BCEC02684A497005EE20E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B64BCEC12684A497005EE20E /* Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
-		B64BCF26268583B4005EE20E /* MlPoll_0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MlPoll_0.swift; sourceTree = "<group>"; };
-		B64BCF2A26858529005EE20E /* BbhGMl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = BbhGMl.xcframework; path = ../BbhGMl/build/BbhGMl.xcframework; sourceTree = "<group>"; };
+		B64BCF3826858D48005EE20E /* BbhGMl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = BbhGMl.xcframework; path = ../../BbhGMl/build/BbhGMl.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,7 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B64BCF2B26858529005EE20E /* BbhGMl.xcframework in Frameworks */,
+				B64BCF3926858D48005EE20E /* BbhGMl.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,7 +151,6 @@
 				B64BCE862684A40B005EE20E /* Info.plist */,
 				B64BCE7E2684A408005EE20E /* MazeSolver.xcdatamodeld */,
 				B64BCEB42684A490005EE20E /* MazeSolver-Bridging-Header.h */,
-				B64BCF26268583B4005EE20E /* MlPoll_0.swift */,
 			);
 			path = MazeSolver;
 			sourceTree = "<group>";
@@ -179,7 +176,7 @@
 		B64BCEAB2684A42F005EE20E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B64BCF2A26858529005EE20E /* BbhGMl.xcframework */,
+				B64BCF3826858D48005EE20E /* BbhGMl.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -194,7 +191,7 @@
 				B64BCE6E2684A408005EE20E /* Sources */,
 				B64BCE6F2684A408005EE20E /* Frameworks */,
 				B64BCE702684A408005EE20E /* Resources */,
-				B64BCEAF2684A430005EE20E /* Embed Frameworks */,
+				B64BCF3B26858D48005EE20E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -325,7 +322,6 @@
 				B64BCEC42684A497005EE20E /* Stack.swift in Sources */,
 				B64BCEC32684A497005EE20E /* MovePath.swift in Sources */,
 				B64BCEC82684A497005EE20E /* AppDelegate.swift in Sources */,
-				B64BCF27268583B4005EE20E /* MlPoll_0.swift in Sources */,
 				B64BCE802684A408005EE20E /* MazeSolver.xcdatamodeld in Sources */,
 				B64BCEC22684A497005EE20E /* SceneDelegate.swift in Sources */,
 			);
