@@ -173,7 +173,7 @@ class ViewController: UIViewController {
                 
                 if board.smartPlay {
                     label.text = "Gen: \(board.poll!.getGeneration())"
-                    win = false
+                    win = true
                 }
                 
                 guard win || board.isGameOver(), !startOverStart else { return }
@@ -182,9 +182,12 @@ class ViewController: UIViewController {
             
                 board.numUnFinishedPlayers = numberOfPlayers
                 board.container.alpha = 0.2
+                
+                win = board.smartPlay ? false : win
+                
                 guard win else {
                     NumOfLoases += 1
-//                    let total = NumOfLoases + numOfWins
+                    //                    let total = NumOfLoases + numOfWins
 //                    print("loase\n\("\(Int(100 * CGFloat(CGFloat(NumOfLoases) / CGFloat(total))))% loase rate")")
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         board.container.alpha = 1
@@ -585,7 +588,7 @@ public class Board {
     
     func isGameOver() -> Bool {
         for player in players {
-            if !player.isFinish && player.playerType == .enemy {
+            if !player.isFinish && (player.playerType == .enemy || smartPlay) {
                 return false
             }
         }
@@ -593,7 +596,7 @@ public class Board {
         return true
     }
     
-    @objc private func addBlockTap(gestureRecognizer: UITapGestureRecognizer) {
+    @objc fileprivate func addBlockTap(gestureRecognizer: UITapGestureRecognizer) {
         
         guard clickAllowed else { return }
         
@@ -610,7 +613,7 @@ public class Board {
         addBlock?(point, players)
     }
     
-    @objc func moveBlockSwipe(gestureRecognizer: UISwipeGestureRecognizer) {
+    @objc fileprivate func moveBlockSwipe(gestureRecognizer: UISwipeGestureRecognizer) {
         guard !didWin && !isGameOver() else { return }
         var blockImage: UIImageView? = nil
         var blockValue: Block? = nil
@@ -676,6 +679,7 @@ public class Board {
             blocks[key] = nil
             blocks[newKey] = value
             
+            guard !smartPlay else { return }
             for player in players {
                 guard player.lose || player.isOnTheWay(point: newKey) else { continue }
                 player.calcGameState()
