@@ -223,8 +223,7 @@ final class MovePath: DNA & Hashable & Decodable {
     func calcFitness(val: MovePath?, best: CGFloat) -> (val: CGFloat, extraDimension: CGFloat) {
 //        let multi: CGFloat = isWin ? 5 : 1
         let dist = distance(from: current, to: val!.current)
-        let ind = (CGFloat(index) + 1)
-        return (min(1 , ((1 / pow(dist + ind , 2)) + best)), CGFloat(index))
+        return (min(1, pow(1 / dist , 4)) * 0.8, CGFloat(index))
     }
     
     func distanceTo(target: MovePath) -> CGFloat {
@@ -232,7 +231,7 @@ final class MovePath: DNA & Hashable & Decodable {
     }
     
     private func distance(from: CGPoint, to: CGPoint) -> CGFloat {
-        return sqrt(pow(from.x - to.x, 2) + pow(from.y - to.y, 2))
+        return pow((pow(from.x - to.x, 2) + pow(from.y - to.y, 2)), 0.5)
     }
     
     func mutate(rate: CGFloat) -> MovePath {
@@ -381,7 +380,7 @@ final class MovePath: DNA & Hashable & Decodable {
         
         var directions: [Direction] = [Direction]()
         
-        var gravity: CGFloat = 0.3
+        var gravity: CGFloat = 0.4
 
         for _ in 0..<length {
             let index = CGFloat.random(in: 0...1) < gravity ? [1, 6, 7].randomElement() : Int.random(in: 0..<selections.count)

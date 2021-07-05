@@ -11,7 +11,7 @@ import BbhGMl
 
 class ViewController: UIViewController {
     
-    private let numberOfPlayers = 20
+    private let numberOfPlayers = 30
     
     private var numOfBlocks = 0
     
@@ -505,18 +505,17 @@ public class Board {
     var moveBlockDown: UISwipeGestureRecognizer!
     var moveBlockUp: UISwipeGestureRecognizer!
     
-    
     private var doneDrawing: (() -> ()) = {}
     
     init(smartPlay: Bool = false, blocks: [CGPoint : Block?], view: UIView?, size: CGPoint, sizeOfItem: CGSize, numberOfPlayers: Int, gameParams: (startLocations: [CGPoint], winLocation: CGPoint), padding: CGFloat) {
         self.smartPlay = smartPlay
         if smartPlay {
-            let lifeSpan: CGFloat = 12
-            poll = MlPoll<MovePath>(num: numberOfPlayers, lifeSpan: lifeSpan, moveSpeed: CGFloat(playerMoveTime), mutatingRate: 0.04)
+            let lifeSpan: CGFloat = 8
+            poll = MlPoll<MovePath>(num: numberOfPlayers, lifeSpan: lifeSpan, moveSpeed: CGFloat(playerMoveTime), mutatingRate:  0.8 / CGFloat((gameParams.winLocation.x - gameParams.startLocations.first!.x) * (gameParams.winLocation.y - gameParams.startLocations.first!.y)))
             let movePath = MovePath()
             let endPoint = gameParams.winLocation
             movePath.assignCurrent = endPoint
-            poll?.start(target: movePath, extra: gameParams.startLocations.first as Any)
+            poll?.start(target: movePath, lengthLimit: Int((gameParams.winLocation.x - gameParams.startLocations.first!.x) * (gameParams.winLocation.y - gameParams.startLocations.first!.y)) , extra: gameParams.startLocations.first as Any)
         
             poll?.stopHandele = {
                 self.stop()
@@ -526,7 +525,7 @@ public class Board {
                 let vals = [fitnessVals.queryVal, fitnessVals.otherVal]
                 let maxInd = vals[0] > vals[1] ? 0 : 1
                 let r = CGFloat.random(in: 0...vals[maxInd] / vals[1 - maxInd])
-                return r < 0.4 ? fitnessVals.queryVal > fitnessVals.otherVal : true  // index > length / 2 /// original - but keep ml decisionHandler implementation most of time
+                return r < 0.6 ? fitnessVals.queryVal > fitnessVals.otherVal : true  // index > length / 2 /// original - but keep ml decisionHandler implementation most of time
             }
         }
         players = [CharacterEntity]()
@@ -894,6 +893,10 @@ public class Board {
             player.image.frame = CGRect(x: padding + startLocations[i].x * sizeOfItem.width, y: startLocations[i].y * sizeOfItem.height , width: sizeOfItem.width, height: sizeOfItem.height)
             i += 1
         }
+        
+        print("win num: \(SmartCharacterEntity.winNum)")
+        
+        SmartCharacterEntity.winNum = 0
         
         doneDrawing()
         
@@ -1294,6 +1297,8 @@ class CharacterEntity: CustomStringConvertible {
 class SmartCharacterEntity: CharacterEntity {
 //    private let agent: Agent<MovePath>!
     
+    static var winNum = 0
+    
     private var agentGetter: (_ index: Int) -> (Agent<MovePath>?) = { _ in
         return nil
     }
@@ -1359,6 +1364,7 @@ class SmartCharacterEntity: CharacterEntity {
         
         if location.equalTo(winLocation) {
 //            startOver?("You Win")
+            SmartCharacterEntity.winNum += 1
             print("Agent: \(agent.toString()) Win")
         }
     }
