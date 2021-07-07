@@ -223,7 +223,7 @@ final class MovePath: DNA & Hashable & Decodable {
     func calcFitness(val: MovePath?, best: CGFloat) -> (val: CGFloat, extraDimension: CGFloat) {
 //        let multi: CGFloat = isWin ? 5 : 1
         let dist = distance(from: current, to: val!.current)
-        return (min(1, pow(1 / (dist + 1) , 4)) * 0.84, CGFloat(index))
+        return (min(1, pow(1 / (dist + 1) , 4)) * 0.92, CGFloat(index))
     }
     
     func distanceTo(target: MovePath) -> CGFloat {
