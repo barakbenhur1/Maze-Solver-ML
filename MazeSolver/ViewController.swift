@@ -23,7 +23,7 @@ class ViewController: UIViewController {
     
     private let numOfX = 10
     
-    private let yStartIndex = 2
+    private let yStartIndex = 3
     
     private var blocks: [CGPoint : Block?]!
     
@@ -145,11 +145,19 @@ class ViewController: UIViewController {
         
         board = Board(smartPlay: true ,blocks: blocks, view: view, size: point, sizeOfItem: size2D, numberOfPlayers: numberOfPlayers, gameParams: (startPoints, winPoint), padding: CGFloat(numOfX) *  widthRemoval / 2)
         
+        board.winEffect = { [self] frame in
+            let block = Block(state: .empty)
+            block.frame = frame
+            smokeEffect(block: block, effectType: .win)
+        }
+        
+        board.winEffect?(CGRect(x: CGFloat(numOfX) *  widthRemoval / 2 + CGFloat(winPoint.x * CGFloat(sizeX)), y: CGFloat(winPoint.y * CGFloat(sizeY)), width: CGFloat(sizeX), height: CGFloat(sizeY)))
+        
         board.start()
         
         if board.smartPlay {
             label.text = "Gen: \(0)\n\(label.text!)"
-            let button = UIButton(frame: CGRect(origin: label.frame.origin, size: CGSize(width: label.frame.width / 3, height: label.frame.height)))
+            let button = UIButton(frame: CGRect(origin: label.frame.origin, size: CGSize(width: label.frame.width / 3, height: label.frame.height / 2)))
             
             button.setTitle("Save / Load", for: .normal)
             button.backgroundColor = UIColor.cyan.withAlphaComponent(0.4)
@@ -270,7 +278,6 @@ class ViewController: UIViewController {
             }
         }
         
-        
         board.addBlock = { [self] point, players in
             guard !board.isGameOver() else { return }
             DispatchQueue.main.async {
@@ -374,7 +381,7 @@ class ViewController: UIViewController {
     }
     
     enum EffectType {
-        case add, cant
+        case add, cant, win
         
         func getTextureName() -> String {
             switch self {
@@ -384,6 +391,8 @@ class ViewController: UIViewController {
                 return "enemy@"
 //            default:
 //                return "block"
+            case .win:
+                return "goal copy"
             }
         }
         
@@ -395,6 +404,8 @@ class ViewController: UIViewController {
                 return 8
 //            default:
 //                return 0
+            case .win:
+                return 0
             }
         }
     }
@@ -424,27 +435,31 @@ class ViewController: UIViewController {
                 
                 skView.backgroundColor = .clear
                 
-                let peDelay = SKAction.wait(forDuration: Block.timeToBuild)
                 
-                let peRemove = SKAction.removeFromParent()
-                
-                fireParticles.run(SKAction.sequence([peDelay , peRemove]))
-                
-                fireParticles.targetNode?.removeFromParent()
-                fireParticles.targetNode = nil
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + Block.timeToBuild) {
-                    skView.removeFromSuperview()
-                    block.image?.alpha = 1
+                if effectType != .win {
+                    let peDelay = SKAction.wait(forDuration: Block.timeToBuild)
+                    
+                    let peRemove = SKAction.removeFromParent()
+                    fireParticles.run(SKAction.sequence([peDelay , peRemove]))
+                    fireParticles.targetNode?.removeFromParent()
+                    fireParticles.targetNode = nil
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + Block.timeToBuild) {
+                        skView.removeFromSuperview()
+                        block.image?.alpha = 1
+                    }
+                }
+                else {
+                    fireParticles.run(SKAction.sequence([SKAction.fadeAlpha(to: 0.05, duration: .infinity)]))
                 }
             }
         }
     }
     
     private func scoreLabel(size: CGFloat) -> UILabel {
-        let spaceY = 20
+        let spaceY = 40
         let spaceX = 30
-        let height = 50
+        let height = 80
         let width = Int(CGFloat(numOfX) * size) - (spaceX * 2)
         let label = UILabel(frame: CGRect(x: spaceX, y: spaceY, width: width, height: height))
         label.textColor = .init(hexString: "#2f2f2f")
@@ -495,6 +510,8 @@ public class Board {
     
     var cantAddEffect: ((CGRect) -> ())?
     
+    var winEffect: ((CGRect) -> ())?
+    
     var addBlock: ((CGPoint, [CharacterEntity]) -> ())?
     
     //    var blocksUpdate: (([CGPoint : Block?]) -> ())?
@@ -511,7 +528,7 @@ public class Board {
         self.smartPlay = smartPlay
         if smartPlay {
             let lifeSpan: CGFloat = 8
-            poll = MlPoll<MovePath>(num: numberOfPlayers, lifeSpan: lifeSpan, moveSpeed: CGFloat(playerMoveTime), mutatingRate:  0.8 / CGFloat((gameParams.winLocation.x - gameParams.startLocations.first!.x) * (gameParams.winLocation.y - gameParams.startLocations.first!.y)))
+            poll = MlPoll<MovePath>(num: numberOfPlayers, mutatingRate:  0.6 / CGFloat((gameParams.winLocation.x - gameParams.startLocations.first!.x) * (gameParams.winLocation.y - gameParams.startLocations.first!.y)), lifeSpanBundle: (lifeSpan, moveSpeed: CGFloat(playerMoveTime), true))
             let movePath = MovePath()
             let endPoint = gameParams.winLocation
             movePath.assignCurrent = endPoint
@@ -1306,9 +1323,13 @@ class SmartCharacterEntity: CharacterEntity {
     init(identifier: Int, agentGetter: @escaping (_ index: Int) -> (Agent<MovePath>?), type: PlayerType, start: CGPoint ,win: CGPoint, padding: CGFloat, playerSpeed: Double) {
         self.agentGetter = agentGetter
         super.init(identifierNum: identifier, type: type, start: start, win: win, padding: padding, playerSpeed: playerSpeed)
-        self.image.alpha = 0.88
+        self.image.alpha = 0.78
+        let label = UILabel(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 14)))
+        label.text = "\(identifier)"
+        self.image.addSubview(label)
     }
     override func start() {
+        self.image.alpha = 0.78
         timer = Timer(timeInterval: playerMoveSpeed, repeats: true, block: { (timer) in
             self.checkWhereToGo()
         })
@@ -1365,7 +1386,7 @@ class SmartCharacterEntity: CharacterEntity {
         if location.equalTo(winLocation) {
 //            startOver?("You Win")
             SmartCharacterEntity.winNum += 1
-            print("Agent: \(agent.toString()) Win")
+//            print("Agent: \(agent.toString()) Win")
         }
     }
 }

@@ -223,15 +223,19 @@ final class MovePath: DNA & Hashable & Decodable {
     func calcFitness(val: MovePath?, best: CGFloat) -> (val: CGFloat, extraDimension: CGFloat) {
 //        let multi: CGFloat = isWin ? 5 : 1
         let dist = distance(from: current, to: val!.current)
-        return (min(1, pow(1 / dist , 4)) * 0.8, CGFloat(index))
+        return (min(1, pow(1 / (dist + 1) , 4)) * 0.84, CGFloat(index))
     }
     
     func distanceTo(target: MovePath) -> CGFloat {
         return distance(from: current, to: target.current)
     }
     
+    func equalTo(byEndGoal other: MovePath) -> Bool {
+        return current.equalTo(other.current)
+    }
+    
     private func distance(from: CGPoint, to: CGPoint) -> CGFloat {
-        return pow((pow(from.x - to.x, 2) + pow(from.y - to.y, 2)), 0.5)
+        return sqrt(pow(from.x - to.x, 2) + pow(from.y - to.y, 2))
     }
     
     func mutate(rate: CGFloat) -> MovePath {
@@ -445,6 +449,10 @@ final class MovePath: DNA & Hashable & Decodable {
     }
     
     static func == (lhs: MovePath, rhs: MovePath) -> Bool {
-        return lhs.current.equalTo(rhs.current)
+        return lhs.current.equalTo(rhs.current) && lhs.allDirections.elementsEqual(rhs.allDirections)
+    }
+    
+    static func != (lhs: MovePath, rhs: MovePath) -> Bool {
+        return !(lhs == rhs)
     }
 }

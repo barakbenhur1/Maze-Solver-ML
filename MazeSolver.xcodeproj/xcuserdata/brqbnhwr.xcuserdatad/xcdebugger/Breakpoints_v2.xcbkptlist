@@ -7,32 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5AA95984-1E11-4935-83F5-86DFEA4F28BF"
+            uuid = "11DE14FD-2D25-478E-96C4-3966245D7E53"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MazeSolver/MlPoll.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "389"
-            endingLineNumber = "389"
-            landmarkName = "newGeneration()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "810D3DA3-202F-42BE-9A53-754D8CECFD78"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "MazeSolver/ViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "514"
-            endingLineNumber = "514"
-            landmarkName = "init(smartPlay:blocks:view:size:sizeOfItem:numberOfPlayers:gameParams:padding:)"
+            startingLineNumber = "689"
+            endingLineNumber = "689"
+            landmarkName = "mutation()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

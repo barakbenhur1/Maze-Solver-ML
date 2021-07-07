@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "MlPoll.pickOne():MlPoll.swift">
+      </ContextState>
+      <ContextState
+         contextName = "Agent.trackSolveTime(start:):MlPoll.swift">
+      </ContextState>
+      <ContextState
+         contextName = "SmartCharacterEntity.checkWhereToGo():ViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "MlPoll.newGeneration():MlPoll.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in MlPoll.start(target:lengthLimit:extra:):MlPoll.swift">
+      </ContextState>
+      <ContextState
+         contextName = "Agent.solveTime.getter:MlPoll.swift">
+      </ContextState>
+      <ContextState
+         contextName = "MlPoll.init(num:lifeSpan:moveSpeed:mutatingRate:):MlPoll.swift">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
