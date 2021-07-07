@@ -11,7 +11,9 @@ import BbhGMl
 
 class ViewController: UIViewController {
     
-    private let numberOfPlayers = 30
+    private var isSmart = false
+    
+    private let numberOfPlayers = 50
     
     private var numOfBlocks = 0
     
@@ -21,9 +23,9 @@ class ViewController: UIViewController {
     
     private var blocksRange = 10...70
     
-    private let numOfX = 10
+    private let numOfX = 12
     
-    private let yStartIndex = 3
+    private var yStartIndex = 3
     
     private var blocks: [CGPoint : Block?]!
     
@@ -32,11 +34,17 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .white.withAlphaComponent(0.8)
+        
+        isSmart = true
+        
         let widthRemoval: CGFloat = 2
         let sizeX = (view.frame.width / CGFloat(numOfX)) - widthRemoval
         let sizeY = (view.frame.width / CGFloat(numOfX))
         
         let label = scoreLabel(size: sizeY)
+        
+        yStartIndex = Int((label.frame.maxY) / sizeY) + 1
         
         label.numberOfLines = 2
         
@@ -71,17 +79,22 @@ class ViewController: UIViewController {
         blocks = [CGPoint : Block]()
         
         let size2D = CGSize(width: sizeX, height: sizeY)
-        let numOfY = Int(view.frame.height / CGFloat(sizeY))
+        let numOfY = Int((view.frame.height - 10) / CGFloat(sizeY))
         
         let point = CGPoint(x: numOfX, y: numOfY)
         let start = CGPoint(x: 0, y: yStartIndex)
         var startPoints: [CGPoint] = [start]
         
         while startPoints.count < numberOfPlayers {
-            let randX = Int.random(in: 0...numOfX / 2)
-            let randY = Int.random(in: yStartIndex...numOfY / 3)
-            let point: CGPoint = CGPoint(x: randX , y: randY)
-            guard !startPoints.contains(point) else { continue }
+            var point: CGPoint = .zero
+            
+            if !isSmart {
+                let randX = Int.random(in: 0...numOfX / 2)
+                let randY = Int.random(in: yStartIndex...numOfY / 3)
+                point = CGPoint(x: randX , y: randY)
+                guard !startPoints.contains(point) else { continue }
+            }
+            
             startPoints.append(point)
         }
         
@@ -107,7 +120,7 @@ class ViewController: UIViewController {
                 square.clipsToBounds = true
             }
             view.addSubview(container)
-            container.layer.cornerRadius = 14
+            container.layer.cornerRadius = 8
             container.clipsToBounds = true
         }
         
@@ -143,7 +156,7 @@ class ViewController: UIViewController {
             blocks[key] = Block(name: "block", state: .solid)
         }
         
-        board = Board(smartPlay: true ,blocks: blocks, view: view, size: point, sizeOfItem: size2D, numberOfPlayers: numberOfPlayers, gameParams: (startPoints, winPoint), padding: CGFloat(numOfX) *  widthRemoval / 2)
+        board = Board(smartPlay: isSmart ,blocks: blocks, view: view, size: point, sizeOfItem: size2D, numberOfPlayers: numberOfPlayers, gameParams: (startPoints, winPoint), padding: CGFloat(numOfX) *  widthRemoval / 2)
         
         board.winEffect = { [self] frame in
             let block = Block(state: .empty)
@@ -169,6 +182,16 @@ class ViewController: UIViewController {
             button.layer.cornerRadius = label.layer.cornerRadius
             
             view.addSubview(button)
+            
+            let sw = UISwitch(frame: CGRect(origin: CGPoint(x: label.frame.origin.x + label.frame.width -  label.frame.width / 7, y: label.frame.origin.y), size: CGSize(width: label.frame.width / 7, height: label.frame.height / 2)))
+           
+            let l = UILabel(frame: CGRect(origin: CGPoint(x: label.frame.origin.x + label.frame.width - label.frame.width / 2.22, y: label.frame.origin.y - 5), size: CGSize(width: label.frame.width / 3, height: label.frame.height / 2)))
+            l.text = "Restart Blocks"
+            sw.isOn = true
+            sw.addTarget(self, action: #selector(self.resetBlocks(sender:)), for: .valueChanged)
+            sw.onTintColor = button.backgroundColor?.withAlphaComponent(0.34)
+            view.addSubview(sw)
+            view.addSubview(l)
         }
         
         var numOfWins = 0
@@ -233,7 +256,7 @@ class ViewController: UIViewController {
                     label.text = "\n\(leftBlocksCount) Out Of \(numOfBlocks + leftBlocks) Blocks Left"
                     var numOfSkips = 0
                     while blocks.count < numOfBlocks {
-                        let randomX = Int.random(in: 0...numOfX - 1)
+                        let randomX = Int.random(in: Int(widthRemoval / 2)...numOfX - Int(widthRemoval / 2) - 1)
                         let randomY = Int.random(in: yStartIndex...numOfY - 1)
                         
                         let key = CGPoint(x: randomX, y: randomY)
@@ -278,13 +301,36 @@ class ViewController: UIViewController {
             }
         }
         
-        board.addBlock = { [self] point, players in
+        board.addBlock = { [self] p, players in
             guard !board.isGameOver() else { return }
             DispatchQueue.main.async {
                 guard leftBlocksCount > 0 else {
                     board.cantAddEffect?(CGRect(x: CGFloat(numOfX) *  widthRemoval / 2 + CGFloat(Int(point.x / CGFloat(sizeX))) * CGFloat(sizeX), y: CGFloat(Int(point.y / CGFloat(sizeY))) * CGFloat(sizeY), width: CGFloat(sizeX), height: CGFloat(sizeY)))
                     return
                 }
+                
+                var point = CGPoint(x: p.x, y: p.y)
+                
+                var x = point.x
+                
+                var y = point.y
+                
+                if point.x < 0 {
+                    x = 0
+                }
+                else if point.x > winPoint.x * sizeX {
+                    x = winPoint.x * sizeX
+                }
+                
+                if point.y < CGFloat(yStartIndex)  * sizeY {
+                    y = CGFloat(yStartIndex) * sizeY
+                }
+                else if point.y > winPoint.y  * sizeY {
+                    y = winPoint.y * sizeY
+                }
+                
+                point = CGPoint(x: x, y: y)
+                
                 let key = CGPoint(x: Int(point.x / CGFloat(sizeX)), y: Int(point.y / CGFloat(sizeY)))
                 let block = board.getBlocks()[key]
                 guard !key.equalTo(winPoint) && (block == nil || block??.state == .empty) else {
@@ -293,7 +339,7 @@ class ViewController: UIViewController {
                 }
                 for player in players {
                     guard !player.location.equalTo(key) else {
-                        board.cantAddEffect?(CGRect(x: CGFloat(numOfX) *  widthRemoval / 2 + CGFloat(Int(point.x / CGFloat(sizeX))) * CGFloat(sizeX), y: CGFloat(Int(point.y / CGFloat(sizeY))) * CGFloat(sizeY), width: CGFloat(sizeX), height: CGFloat(sizeY)))
+                        board.cantAddEffect?(CGRect(x: CGFloat(numOfX) * widthRemoval / 2 + CGFloat(Int(point.x / CGFloat(sizeX))) * CGFloat(sizeX), y: CGFloat(Int(point.y / CGFloat(sizeY))) * CGFloat(sizeY), width: CGFloat(sizeX), height: CGFloat(sizeY)))
                         return
                     }
                 }
@@ -338,6 +384,10 @@ class ViewController: UIViewController {
             block.frame = frame
             smokeEffect(block: block, effectType: .cant)
         }
+    }
+    
+    @objc private func resetBlocks(sender: UISwitch) {
+        board.resetBlocks = sender.isOn
     }
     
     @objc private func showSaveLoad() {
@@ -474,6 +524,7 @@ class ViewController: UIViewController {
 }
 
 public class Board {
+    
     private var blocks: [CGPoint : Block?]!
     
     private var originalBlocks: [CGPoint : Block?]!
@@ -513,6 +564,8 @@ public class Board {
     var winEffect: ((CGRect) -> ())?
     
     var addBlock: ((CGPoint, [CharacterEntity]) -> ())?
+    
+    var resetBlocks = true
     
     //    var blocksUpdate: (([CGPoint : Block?]) -> ())?
     
@@ -781,7 +834,7 @@ public class Board {
             
             let id = players.count
             if smartPlay {
-                player = SmartCharacterEntity(identifier: id, agentGetter: poll!.getAgentsGetters()[id], type: .player, start: startLocations[id], win: win, padding: padding, playerSpeed: playerMoveTime)
+                player = SmartCharacterEntity(identifier: id, agentGetter: poll!.getAgentsGetters()[id], type: CharacterEntity.PlayerType(rawValue: Int.random(in: 0...3))!, start: startLocations[id], win: win, padding: padding, playerSpeed: playerMoveTime)
             }
             else {
                 player = CharacterEntity(identifierNum: id, type: players.count == 0 ? .player : .enemy, start: startLocations[id], win: win, padding: padding, playerSpeed: players.count == 0 ? playerMoveTime : enemyMoveTime)
@@ -895,7 +948,9 @@ public class Board {
         numUnFinishedPlayers = numOfPlayers
         stuckPlayers = nil
         
-        setBlocks(blocks: originalBlocks)
+        if resetBlocks {
+            setBlocks(blocks: originalBlocks)
+        }
         
         clickAllowed = true
         
@@ -1029,13 +1084,17 @@ class CharacterEntity: CustomStringConvertible {
         case move, lose, win
     }
     
-    enum PlayerType {
-        case player, enemy
+    enum PlayerType: Int {
+        case player, enemy, other, other2
         
         func getImage() -> UIImage {
             switch self {
             case .player:
                 return UIImage(named: "player")!
+            case .other:
+                return UIImage(named: "enemy@")!
+            case .other2:
+                return UIImage(named: "enemy")!
             default:
                 return UIImage(named: "enemy")!
             }
@@ -1247,6 +1306,8 @@ class CharacterEntity: CustomStringConvertible {
                     loase()
                     stuck?(true)
                 }
+            default:
+                break
             }
             
         default:
@@ -1326,6 +1387,8 @@ class SmartCharacterEntity: CharacterEntity {
         self.image.alpha = 0.78
         let label = UILabel(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 14)))
         label.text = "\(identifier)"
+        let r = Int.random(in: 0..<8)
+        label.textColor = r < 1 ? .blue : (r < 2 ? .green : (r < 3 ? .systemRed : (r < 4 ? .orange : (r < 5 ? .purple : (r < 6 ? .black : r < 7 ? .yellow : .systemIndigo)))))
         self.image.addSubview(label)
     }
     override func start() {
